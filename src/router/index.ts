@@ -18,6 +18,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/DetailPage.vue'),
     props: true, // passes :city as a prop to the component
   },
+  {
+    path: '/profile',
+    name: 'Profile',
+    // Only downloaded when user navigates to the profile page
+    component: () => import('../pages/ProfilePage.vue'),
+  },
 ]
 
 const router = createRouter({
