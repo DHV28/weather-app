@@ -26,7 +26,7 @@ defineEmits<{
       aria-label="Change profile photo"
       @click="$emit('edit')"
     >
-      ✏️
+      <FontAwesomeIcon :icon="['fas', 'pencil']" style="color: rgb(0, 0, 0);" />
     </button>
   </div>
 </template>

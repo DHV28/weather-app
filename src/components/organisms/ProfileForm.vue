@@ -1,8 +1,10 @@
 <script setup lang="ts">
 // Organism: ProfileForm
-// Static UI for the Edit Profile page — shows avatar, user info, and read-only fields.
-// Edit functionality will be wired up in a later commit.
+// Two modes:
+//   - View mode (isEditing = false): fields readonly, no pencil, button says EDIT
+//   - Edit mode (isEditing = true): fields editable, pencil on avatar, button says SUBMIT
 
+import { ref, reactive } from 'vue'
 import avatarImg from '../../assets/avatar.png'
 import AvatarImage from '../atoms/AvatarImage.vue'
 import BaseInput from '../atoms/BaseInput.vue'
@@ -10,27 +12,66 @@ import BaseButton from '../atoms/BaseButton.vue'
 
 const PLACEHOLDER_AVATAR = avatarImg
 
+// Controls which mode we are in
+const isEditing = ref(false)
+
+// Holds the editable form values
+const form = reactive({
+  fullName: 'Jane Doe',
+  email: 'jane@gmail.com',
+  phone: '123 - 456 - 7890',
+})
+
+function handleButtonClick() {
+  if (!isEditing.value) {
+    // EDIT clicked — switch to edit mode
+    isEditing.value = true
+  } else {
+    // SUBMIT clicked — save and return to view mode
+    isEditing.value = false
+  }
+}
 </script>
 
 <template>
   <div class="profile-form">
-    <!-- Avatar + display name and contact info -->
+    <!-- Avatar: pencil icon only appears in edit mode -->
     <div class="profile-form__avatar-section">
-      <AvatarImage :src="PLACEHOLDER_AVATAR" alt="Jane Doe profile photo" />
-      <p class="profile-form__name">Jane Doe</p>
-      <p class="profile-form__meta">jane@gmail.com | +01 234 567 89</p>
+      <AvatarImage
+        :src="PLACEHOLDER_AVATAR"
+        alt="Profile photo"
+        :editable="isEditing"
+      />
+      <p class="profile-form__name">{{ form.fullName }}</p>
+      <p class="profile-form__meta">{{ form.email }} | +01 234 567 89</p>
     </div>
 
-    <!-- Read-only fields showing current profile data -->
+    <!-- Fields: readonly in view mode, editable in edit mode -->
     <div class="profile-form__fields">
-      <BaseInput label="Full name" model-value="Jane Doe" :readonly="true" />
-      <BaseInput label="Email" model-value="jane@gmail.com" type="email" :readonly="true" />
-      <BaseInput label="Phone Number" model-value="123 - 456 - 7890" type="tel" :readonly="true" />
+      <BaseInput
+        v-model="form.fullName"
+        label="Full name"
+        :readonly="!isEditing"
+      />
+      <BaseInput
+        v-model="form.email"
+        label="Email"
+        type="email"
+        :readonly="!isEditing"
+      />
+      <BaseInput
+        v-model="form.phone"
+        label="Phone Number"
+        type="tel"
+        :readonly="!isEditing"
+      />
     </div>
 
-    <!-- EDIT button — will trigger edit mode in a future commit -->
+    <!-- Button text switches between EDIT and SUBMIT -->
     <div class="profile-form__action">
-      <BaseButton>EDIT</BaseButton>
+      <BaseButton @click="handleButtonClick">
+        {{ isEditing ? 'SUBMIT' : 'EDIT' }}
+      </BaseButton>
     </div>
   </div>
 </template>
@@ -71,7 +112,6 @@ const PLACEHOLDER_AVATAR = avatarImg
   flex: 1;
 }
 
-/* Pushes the EDIT button to the bottom of the page */
 .profile-form__action {
   margin-top: auto;
   padding-top: 24px;
