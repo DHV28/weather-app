@@ -102,11 +102,32 @@ export function useWeather() {
     weatherActions.setLoading(false)
   }
 
+  // Fetch detail + forecast by exact coordinates — used when coming from Search
+  // so "Milan, IL" doesn't accidentally load "Milan, Italy"
+  async function fetchDetailByCoords(lat: number, lon: number) {
+    weatherActions.setLoading(true)
+    weatherActions.setError(null)
+
+    const weatherRes = await getWeatherByCoords(lat, lon, WeatherUnit.Metric)
+
+    if (weatherRes.error || !weatherRes.data) {
+      weatherActions.setError(weatherRes.error ?? 'Failed to load weather')
+      weatherActions.setLoading(false)
+      return
+    }
+
+    const forecastRes = await getForecast(weatherRes.data.name, WeatherUnit.Metric)
+
+    weatherActions.setCurrentWeather(weatherRes.data)
+    weatherActions.setForecast(forecastRes.data?.list ?? [])
+    weatherActions.setLoading(false)
+  }
+
   return {
-    // Expose state as readonly so components can read but not mutate directly
     weatherState,
     searchCity,
     fetchByCoords,
     fetchDetail,
+    fetchDetailByCoords,
   }
 }

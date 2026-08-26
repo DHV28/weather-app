@@ -44,6 +44,11 @@ const actions = {
     }
   },
 
+  // Removes a city card by id
+  removeCityCard(id: number) {
+    state.cityCards = state.cityCards.filter(c => c.id !== id)
+  },
+
   // Adds a city to the top of the search history, avoiding duplicates
   addToHistory(city: string) {
     const normalised = city.trim().toLowerCase()

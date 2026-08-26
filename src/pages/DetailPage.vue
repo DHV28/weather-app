@@ -3,19 +3,50 @@
 // Full weather detail for a selected city.
 
 import { onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useWeather } from '../composables/useWeather'
+import { weatherActions } from '../store/weatherState'
 import HourlyForecast from '../components/organisms/HourlyForecast.vue'
 import WeeklyForecast from '../components/organisms/WeeklyForecast.vue'
 
 const props = defineProps<{ city: string }>()
 const router = useRouter()
-const { weatherState, fetchDetail } = useWeather()
+const route = useRoute()
+const { weatherState, fetchDetail, fetchDetailByCoords, searchCity } = useWeather()
 
-onMounted(() => fetchDetail(props.city))
+onMounted(() => {
+  const lat = route.query.lat ? Number(route.query.lat) : null
+  const lon = route.query.lon ? Number(route.query.lon) : null
+
+  // If we have coordinates (came from search), use them for the exact city
+  // Otherwise fall back to city name (came from home list card)
+  if (lat && lon) {
+    fetchDetailByCoords(lat, lon)
+  } else {
+    fetchDetail(props.city)
+  }
+})
 
 const weather = computed(() => weatherState.currentWeather)
 const forecast = computed(() => weatherState.forecast)
+
+// True if this city is already saved in the home list
+const isSaved = computed(() =>
+  weatherState.cityCards.some(c => c.city.toLowerCase() === props.city.toLowerCase())
+)
+
+// Add city to home list then go back
+async function addToList() {
+  await searchCity(props.city)
+  router.push({ name: 'Home' })
+}
+
+// Remove city from home list then go back
+function removeFromList() {
+  const card = weatherState.cityCards.find(c => c.city.toLowerCase() === props.city.toLowerCase())
+  if (card) weatherActions.removeCityCard(card.id)
+  router.push({ name: 'Home' })
+}
 
 function formatDate(dt: number): string {
   return new Date(dt * 1000).toLocaleDateString('en-US', {
@@ -57,8 +88,13 @@ function refresh() { fetchDetail(props.city) }
             <FontAwesomeIcon :icon="['fas', 'arrow-left']" />
           </button>
           <h1 class="detail-page__city">{{ weather.name }}, {{ weather.sys.country }}</h1>
-          <button class="detail-page__icon-btn" aria-label="Remove city">
-            <FontAwesomeIcon :icon="['fas', 'trash']" />
+          <!-- Shows + if city not saved yet, trash if already in the list -->
+          <button
+            class="detail-page__icon-btn"
+            :aria-label="isSaved ? 'Remove city' : 'Add to list'"
+            @click="isSaved ? removeFromList() : addToList()"
+          >
+            <FontAwesomeIcon :icon="['fas', isSaved ? 'trash' : 'plus']" />
           </button>
         </header>
 
