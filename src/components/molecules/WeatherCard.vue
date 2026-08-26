@@ -1,12 +1,17 @@
 <script setup lang="ts">
 // Molecule: WeatherCard
 // One city card in the list — shows city name, local time, condition, temp, H/L.
-// 'isMyLocation' makes the first card bold with "My Location" label (like the Figma).
-// Clicking the card will navigate to the detail page (wired up in HomePage).
+// Background image changes based on the weather condition from the API.
 
-defineProps<{
+import bgClear from '../../assets/bg-clear.jpg'
+import bgRain from '../../assets/bg-rain.jpg'
+import bgCloudy from '../../assets/bg-cloudy.jpg'
+import bgSnow from '../../assets/bg-snow.jpg'
+import bgDefault from '../../assets/bg-default.jpg'
+
+const props = defineProps<{
   city: string
-  subtitle: string       // local time or area name (e.g. "Bangsar South" or "7:30 PM")
+  subtitle: string
   temperature: number
   condition: string
   high: number
@@ -17,58 +22,73 @@ defineProps<{
 defineEmits<{
   select: []
 }>()
+
+// Maps the weather condition string to the right background photo
+function getBackground(condition: string): string {
+  const c = condition.toLowerCase()
+  if (c.includes('rain') || c.includes('drizzle')) return `url(${bgRain})`
+  if (c.includes('snow') || c.includes('sleet'))   return `url(${bgSnow})`
+  if (c.includes('clear') || c.includes('sunny'))  return `url(${bgClear})`
+  if (c.includes('cloud') || c.includes('storm') || c.includes('thunder')) return `url(${bgCloudy})`
+  return `url(${bgDefault})`
+}
+
+const cardBackground = getBackground(props.condition)
 </script>
 
 <template>
   <article
     class="weather-card"
-    :class="{ 'weather-card--my-location': isMyLocation }"
     role="button"
     tabindex="0"
     @click="$emit('select')"
     @keyup.enter="$emit('select')"
   >
-    <!-- Top row: city name + temperature -->
-    <div class="weather-card__top">
-      <div>
-        <!-- Show "My Location" label above city name for the user's current location -->
-        <p v-if="isMyLocation" class="weather-card__my-location-label">My Location</p>
-        <h2 class="weather-card__city">{{ city }}</h2>
-        <p class="weather-card__subtitle">{{ subtitle }}</p>
+    <!-- Dark overlay so white text is readable over any photo -->
+    <div class="weather-card__overlay">
+      <div class="weather-card__top">
+        <div>
+          <p v-if="isMyLocation" class="weather-card__my-location-label">My Location</p>
+          <h2 class="weather-card__city">{{ city }}</h2>
+          <p class="weather-card__subtitle">{{ subtitle }}</p>
+        </div>
+        <p class="weather-card__temp">{{ temperature }}°</p>
       </div>
-      <p class="weather-card__temp">{{ temperature }}°</p>
-    </div>
 
-    <!-- Bottom row: weather condition + H/L range -->
-    <div class="weather-card__bottom">
-      <p class="weather-card__condition">{{ condition }}</p>
-      <p class="weather-card__range">H:{{ high }}° L:{{ low }}°</p>
+      <div class="weather-card__bottom">
+        <p class="weather-card__condition">{{ condition }}</p>
+        <p class="weather-card__range">H:{{ high }}° L:{{ low }}°</p>
+      </div>
     </div>
   </article>
 </template>
 
 <style scoped>
 .weather-card {
-  /* Dark blue sky gradient — matches the card backgrounds in the Figma */
-  background: linear-gradient(135deg, #3a5f8a 0%, #2c3e6b 60%, #1a2a4a 100%);
   border-radius: 16px;
-  padding: 16px 20px;
-  color: #ffffff;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  overflow: hidden;
   min-height: 120px;
+  cursor: pointer;
   transition: transform 0.15s ease;
+  /* v-bind lets us use the JS variable directly in CSS */
+  background-image: v-bind(cardBackground);
+  background-size: cover;
+  background-position: center;
 }
 
 .weather-card:hover {
   transform: scale(1.01);
 }
 
-/* First card has a slightly lighter/warmer blue tint */
-.weather-card--my-location {
-  background: linear-gradient(135deg, #4a6fa5 0%, #3a5080 60%, #243660 100%);
+/* Semi-transparent dark layer so text stays readable over any photo */
+.weather-card__overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
 }
 
 .weather-card__top {
@@ -96,7 +116,6 @@ defineEmits<{
   margin: 2px 0 0 0;
 }
 
-/* Large temperature number on the right */
 .weather-card__temp {
   font-size: 48px;
   font-weight: 200;
