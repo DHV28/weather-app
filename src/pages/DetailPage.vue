@@ -30,6 +30,11 @@ onMounted(() => {
 const weather = computed(() => weatherState.currentWeather)
 const forecast = computed(() => weatherState.forecast)
 
+// Use the display name from search query if available (e.g. "Kyoto" not "Shijōdori")
+const displayCity = computed(() =>
+  (route.query.displayName as string) || weather.value?.name || props.city
+)
+
 // True if this city is already saved in the home list
 const isSaved = computed(() =>
   weatherState.cityCards.some(c => c.city.toLowerCase() === props.city.toLowerCase())
@@ -89,7 +94,7 @@ function refresh() { fetchDetail(props.city) }
           <button class="detail-page__icon-btn" aria-label="Go back" @click="goBack">
             <FontAwesomeIcon :icon="['fas', 'arrow-left']" />
           </button>
-          <h1 class="detail-page__city">{{ weather.name }}, {{ weather.sys.country }}</h1>
+          <h1 class="detail-page__city">{{ displayCity }}, {{ weather.sys.country }}</h1>
           <!-- Shows + if city not saved yet, trash if already in the list -->
           <button
             class="detail-page__icon-btn"
