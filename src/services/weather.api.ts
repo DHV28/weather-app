@@ -1,7 +1,7 @@
 // weather.api.ts
 // All OpenWeatherMap API calls live here.
 
-import type { WeatherData, ForecastResponse, ApiResponse } from '../types/weather.types'
+import type { WeatherData, ForecastResponse, ApiResponse, GeocodingResult } from '../types/weather.types'
 import { WeatherUnit } from '../types/weather.types'
 
 // Read the API key from the .env file (set VITE_OPENWEATHER_API_KEY in .env)
@@ -44,6 +44,13 @@ export async function getWeatherByCoords(
 ): Promise<ApiResponse<WeatherData>> {
   const url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
   return apiFetch<WeatherData>(url)
+}
+
+// Search for cities by name — returns up to 5 matching locations with coordinates
+// Used to show the suggestion list on the Search page
+export async function searchCities(query: string): Promise<ApiResponse<GeocodingResult[]>> {
+  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+  return apiFetch<GeocodingResult[]>(url)
 }
 
 // Fetch 5-day / 3-hour forecast by city name

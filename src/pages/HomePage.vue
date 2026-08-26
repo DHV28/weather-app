@@ -44,6 +44,10 @@ function onCitySelected(city: string) {
 function goToProfile() {
   router.push({ name: 'Profile' })
 }
+
+function goToSearch() {
+  router.push({ name: 'Search' })
+}
 </script>
 
 <template>
@@ -55,8 +59,9 @@ function goToProfile() {
       </button>
     </header>
 
-    <div class="home-page__search">
-      <SearchBar v-model="searchQuery" @search="onSearch" />
+    <!-- Tapping the search bar navigates to the dedicated Search page -->
+    <div class="home-page__search" role="button" tabindex="0" @click="goToSearch" @keyup.enter="goToSearch">
+      <SearchBar v-model="searchQuery" />
     </div>
 
     <!-- Loading state -->
@@ -106,6 +111,7 @@ function goToProfile() {
 
 .home-page__search {
   margin-bottom: 8px;
+  cursor: pointer;
 }
 
 .home-page__status {

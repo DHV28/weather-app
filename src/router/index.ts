@@ -21,8 +21,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'Profile',
-    // Only downloaded when user navigates to the profile page
     component: () => import('../pages/ProfilePage.vue'),
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    // Lazy-loaded — only fetched when user taps the search bar
+    component: () => import('../pages/SearchPage.vue'),
   },
 ]
 

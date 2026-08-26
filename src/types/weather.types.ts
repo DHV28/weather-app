@@ -78,6 +78,15 @@ export interface ApiResponse<T> {
   error: string | null
 }
 
+// Shape of one result from the Geocoding API (/geo/1.0/direct)
+export interface GeocodingResult {
+  name: string      // city name e.g. "Milan"
+  country: string   // country code e.g. "IT"
+  state?: string    // state/region e.g. "TN" (only for some countries)
+  lat: number
+  lon: number
+}
+
 // What we show on each city card in the list
 export interface CityCard {
   id: number
