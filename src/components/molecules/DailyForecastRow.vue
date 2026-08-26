@@ -41,7 +41,7 @@ defineProps<{
   align-items: center;
   gap: 14px;
   /* Soft lavender — matches the Figma weekly row background */
-  background: #e8ecfa;
+  background: #d2dfff;
   border-radius: 16px;
   padding: 14px 16px;
 }
@@ -50,7 +50,7 @@ defineProps<{
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #7b8fdd;
+  background: #98b4fd;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -24,20 +24,22 @@ defineProps<{
 
 <style scoped>
 .hourly-card {
-  flex: 1;               /* all 4 cards share equal width */
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f2f3f8;
+  background: #eeeff1;
   border-radius: 14px;
   padding: 12px 8px;
   gap: 2px;
-  min-width: 0;          /* prevents flex blowout */
+  min-width: 0;
 }
 
 .hourly-card__icon {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
+  /* Adds outline around light/white icons so they show on grey background */
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
 }
 
 .hourly-card__temp {
