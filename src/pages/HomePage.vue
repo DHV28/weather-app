@@ -1,63 +1,46 @@
 <script setup lang="ts">
 // Page: HomePage
-// The main screen — shows the Weather header, search bar, and list of city cards.
-// Static placeholder data is used for now; real API data comes in a later commit.
+// On mount: requests Geolocation to fetch "My Location" weather.
+// User can search for cities using the search bar — results are added to the list.
 
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useWeather } from '../composables/useWeather'
 import SearchBar from '../components/atoms/SearchBar.vue'
 import WeatherList from '../components/organisms/WeatherList.vue'
 
 const router = useRouter()
 const searchQuery = ref('')
+const { weatherState, searchCity, fetchByCoords } = useWeather()
 
-// Placeholder city data — will be replaced with OpenWeatherMap API data later
-const cities = [
-  {
-    id: 1,
-    city: 'Bangsar South',
-    subtitle: 'Bangsar South',
-    temperature: 24,
-    condition: 'Moderate Rain',
-    high: 30,
-    low: 25,
-    isMyLocation: true,
-  },
-  {
-    id: 2,
-    city: 'Seongnam-si',
-    subtitle: '7:30 PM',
-    temperature: 21,
-    condition: 'Partly Cloudy',
-    high: 29,
-    low: 15,
-  },
-  {
-    id: 3,
-    city: 'London',
-    subtitle: '10:30 AM',
-    temperature: 9,
-    condition: 'Not as cold tomorrow, with a high of 16°',
-    high: 16,
-    low: -4,
-  },
-  {
-    id: 4,
-    city: 'Milan',
-    subtitle: '11:30 AM',
-    temperature: 12,
-    condition: 'Not as cold tomorrow, with a high of 20°',
-    high: 20,
-    low: 0,
-  },
-]
+// Pull the city cards list from global state
+const cities = computed(() => weatherState.cityCards)
 
-// Navigate to the detail page for the selected city
+// On page load, ask the browser for the user's GPS location
+onMounted(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        fetchByCoords(position.coords.latitude, position.coords.longitude)
+      },
+      () => {
+        // User denied location — that's fine, they can search manually
+      }
+    )
+  }
+})
+
+// Called when user presses Enter in the search bar
+async function onSearch(query: string) {
+  if (!query.trim()) return
+  await searchCity(query.trim())
+  searchQuery.value = ''
+}
+
 function onCitySelected(city: string) {
   router.push({ name: 'Detail', params: { city } })
 }
 
-// Navigate to the profile page when the person icon is clicked
 function goToProfile() {
   router.push({ name: 'Profile' })
 }
@@ -65,7 +48,6 @@ function goToProfile() {
 
 <template>
   <main class="home-page">
-    <!-- Header: title + profile icon -->
     <header class="home-page__header">
       <h1 class="home-page__title">Weather</h1>
       <button class="home-page__profile-btn" aria-label="Go to profile" @click="goToProfile">
@@ -73,13 +55,23 @@ function goToProfile() {
       </button>
     </header>
 
-    <!-- Search bar -->
     <div class="home-page__search">
-      <SearchBar v-model="searchQuery" />
+      <SearchBar v-model="searchQuery" @search="onSearch" />
     </div>
 
-    <!-- List of city weather cards -->
-    <WeatherList :cities="cities" @city-selected="onCitySelected" />
+    <!-- Loading state -->
+    <p v-if="weatherState.loading" class="home-page__status">Loading...</p>
+
+    <!-- Error message if API call failed -->
+    <p v-else-if="weatherState.error" class="home-page__error">{{ weatherState.error }}</p>
+
+    <!-- Empty state before any city is loaded -->
+    <p v-else-if="cities.length === 0" class="home-page__status">
+      Search for a city to get started
+    </p>
+
+    <!-- City cards list -->
+    <WeatherList v-else :cities="cities" @city-selected="onCitySelected" />
   </main>
 </template>
 
@@ -114,5 +106,17 @@ function goToProfile() {
 
 .home-page__search {
   margin-bottom: 8px;
+}
+
+.home-page__status {
+  text-align: center;
+  color: var(--color-text-muted);
+  margin-top: 40px;
+}
+
+.home-page__error {
+  text-align: center;
+  color: var(--color-error);
+  margin-top: 40px;
 }
 </style>

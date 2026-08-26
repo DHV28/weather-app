@@ -1,5 +1,5 @@
 import { reactive, readonly } from 'vue'
-import type { WeatherData, ForecastItem } from '../types/weather.types'
+import type { WeatherData, ForecastItem, CityCard } from '../types/weather.types'
 
 // This is our global state for the whole app.
 // We use Vue's reactive() so any component that reads from this
@@ -7,19 +7,20 @@ import type { WeatherData, ForecastItem } from '../types/weather.types'
 const state = reactive<{
   currentWeather: WeatherData | null
   forecast: ForecastItem[]
+  cityCards: CityCard[]
   searchHistory: string[]
   loading: boolean
   error: string | null
 }>({
-  currentWeather: null, // holds weather data for the currently searched city
-  forecast: [],         // holds the 5-day forecast list
-  searchHistory: [],    // list of cities the user has searched before
-  loading: false,       // true while we are waiting for the API response
-  error: null,          // holds an error message if the API call fails
+  currentWeather: null,
+  forecast: [],
+  cityCards: [],        // list of city cards shown on the home page
+  searchHistory: [],    // cities the user has searched before
+  loading: false,
+  error: null,
 })
 
 // These are the only functions allowed to change the state.
-// Keeping changes in one place makes it easier to debug.
 const actions = {
   setCurrentWeather(data: WeatherData | null) {
     state.currentWeather = data
@@ -29,8 +30,21 @@ const actions = {
     state.forecast = items
   },
 
-  // Adds a city to the top of the search history list.
-  // We avoid adding the same city twice (case-insensitive check).
+  // Puts the "My Location" card at index 0, always at the top
+  setMyLocationCard(card: CityCard) {
+    const withoutLocation = state.cityCards.filter(c => !c.isMyLocation)
+    state.cityCards = [card, ...withoutLocation]
+  },
+
+  // Adds a searched city card — avoids duplicates by city id
+  addCityCard(card: CityCard) {
+    const exists = state.cityCards.some(c => c.id === card.id)
+    if (!exists) {
+      state.cityCards.push(card)
+    }
+  },
+
+  // Adds a city to the top of the search history, avoiding duplicates
   addToHistory(city: string) {
     const normalised = city.trim().toLowerCase()
     if (!state.searchHistory.includes(normalised)) {
@@ -46,7 +60,6 @@ const actions = {
     state.error = message
   },
 
-  // Resets weather data and clears any error — useful when starting a new search
   clearWeather() {
     state.currentWeather = null
     state.forecast = []
@@ -54,7 +67,5 @@ const actions = {
   },
 }
 
-// We export a readonly version of state so components can read it
-// but cannot accidentally change it directly — they must use actions.
 export const weatherState = readonly(state)
 export const weatherActions = actions
