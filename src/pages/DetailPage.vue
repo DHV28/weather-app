@@ -12,7 +12,7 @@ import WeeklyForecast from '../components/organisms/WeeklyForecast.vue'
 const props = defineProps<{ city: string }>()
 const router = useRouter()
 const route = useRoute()
-const { weatherState, fetchDetail, fetchDetailByCoords, searchCity } = useWeather()
+const { weatherState, fetchDetail, fetchDetailByCoords, addCurrentToList } = useWeather()
 
 onMounted(() => {
   const lat = route.query.lat ? Number(route.query.lat) : null
@@ -35,9 +35,11 @@ const isSaved = computed(() =>
   weatherState.cityCards.some(c => c.city.toLowerCase() === props.city.toLowerCase())
 )
 
-// Add city to home list then go back
-async function addToList() {
-  await searchCity(props.city)
+// Add city to home list using already-loaded data — no extra API call needed
+// Pass displayName from route query so we save "Jakarta" not the district name
+function addToList() {
+  const displayName = route.query.displayName as string | undefined
+  addCurrentToList(displayName)
   router.push({ name: 'Home' })
 }
 

@@ -27,12 +27,34 @@ watch(query, (val) => {
   }, 300)
 })
 
-// Build a readable region string e.g. "Italy" or "TN United States"
+// Maps ISO country codes to full country names for readable display
+const COUNTRY_NAMES: Record<string, string> = {
+  US: 'United States', GB: 'United Kingdom', AU: 'Australia', CA: 'Canada',
+  DE: 'Germany', FR: 'France', IT: 'Italy', ES: 'Spain', JP: 'Japan',
+  CN: 'China', IN: 'India', BR: 'Brazil', MX: 'Mexico', KR: 'South Korea',
+  MY: 'Malaysia', SG: 'Singapore', TH: 'Thailand', ID: 'Indonesia',
+  PH: 'Philippines', VN: 'Vietnam', NL: 'Netherlands', SE: 'Sweden',
+  NO: 'Norway', DK: 'Denmark', FI: 'Finland', CH: 'Switzerland',
+  AT: 'Austria', BE: 'Belgium', PT: 'Portugal', PL: 'Poland', RU: 'Russia',
+  ZA: 'South Africa', NG: 'Nigeria', EG: 'Egypt', AR: 'Argentina', CL: 'Chile',
+  NZ: 'New Zealand', AE: 'UAE', SA: 'Saudi Arabia', TR: 'Turkey', GR: 'Greece',
+}
+
+// Build a readable region string e.g. "Italy" or "TN, United States"
+// We use the state only if it's short (state codes like "TN", "IL")
+// to avoid repeating long official names like "Special Capital Region of Jakarta"
 function formatRegion(result: GeocodingResult): string {
-  const parts = []
-  if (result.state) parts.push(result.state)
-  parts.push(result.country)
-  return parts.join(' ')
+  const countryName = COUNTRY_NAMES[result.country] ?? result.country
+  const stateCode = result.state && result.state.length <= 3 ? result.state : null
+  return stateCode ? `${stateCode} ${countryName}` : countryName
+}
+
+// Use the user's typed query as the display city name
+// because the API sometimes returns long official names (e.g. "Special capital Region of Jakarta")
+function getDisplayName(result: GeocodingResult): string {
+  return result.name.length > 20
+    ? query.value.trim()
+    : result.name
 }
 
 // Navigate to detail page with exact coordinates so the right city loads
@@ -41,7 +63,8 @@ function onSelect(result: GeocodingResult) {
   router.push({
     name: 'Detail',
     params: { city: result.name },
-    query: { lat: result.lat, lon: result.lon },
+    // Pass the display name so DetailPage can save "Jakarta" not "Penecongan"
+    query: { lat: result.lat, lon: result.lon, displayName: getDisplayName(result) },
   })
 }
 
@@ -90,7 +113,7 @@ function goBack() {
       <SearchSuggestionItem
         v-for="result in suggestions"
         :key="`${result.lat}-${result.lon}`"
-        :city="result.name"
+        :city="getDisplayName(result)"
         :region="formatRegion(result)"
         @select="onSelect(result)"
       />

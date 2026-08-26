@@ -123,11 +123,34 @@ export function useWeather() {
     weatherActions.setLoading(false)
   }
 
+  // Adds the currently viewed city to the home list using already-loaded data.
+  // This avoids making a new API call with a possibly wrong city name string.
+  // displayName lets the caller override the API's local district name
+  // e.g. save "Jakarta" instead of "Penecongan"
+  function addCurrentToList(displayName?: string) {
+    const data = weatherState.currentWeather
+    if (!data) return
+
+    const card: CityCard = {
+      id: data.id,
+      city: displayName ?? data.name,
+      country: data.sys.country,
+      subtitle: formatLocalTime(data.dt, data.timezone),
+      temperature: Math.round(data.main.temp),
+      condition: data.weather[0]?.description ?? '',
+      high: Math.round(data.main.temp_max),
+      low: Math.round(data.main.temp_min),
+    }
+
+    weatherActions.addCityCard(card)
+  }
+
   return {
     weatherState,
     searchCity,
     fetchByCoords,
     fetchDetail,
     fetchDetailByCoords,
+    addCurrentToList,
   }
 }
