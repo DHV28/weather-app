@@ -32,11 +32,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Limit the app width on desktop so it looks like a mobile app */
+/* #app just fills the viewport — MainLayout.vue handles max-width and centering */
 #app {
-  max-width: 430px;
   min-height: 100vh;
-  margin: 0 auto;
-  background: #ffffff;
-  position: relative;
 }

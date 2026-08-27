@@ -1,9 +1,14 @@
 <script setup lang="ts">
 // App.vue is the root component — it's the first thing that loads.
-// RouterView renders whichever page component matches the current URL.
-// e.g. navigating to /profile renders ProfilePage, / renders HomePage.
+// It wraps everything in MainLayout (our Templates layer) which handles
+// the max-width centering and outer shell.
+// RouterView then renders whichever Page matches the current URL inside that shell.
+
+import MainLayout from './components/templates/MainLayout.vue'
 </script>
 
 <template>
-  <RouterView />
+  <MainLayout>
+    <RouterView />
+  </MainLayout>
 </template>
