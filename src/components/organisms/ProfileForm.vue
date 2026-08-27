@@ -3,6 +3,9 @@
 // Two modes:
 //   - View mode (isEditing = false): fields readonly, no pencil, button says EDIT
 //   - Edit mode (isEditing = true): fields editable, pencil on avatar, button says SUBMIT
+//
+// Validation runs only on SUBMIT. If any field is invalid, error messages
+// appear below the field and we stay in edit mode so the user can fix them.
 
 import { ref, reactive } from 'vue'
 import avatarImg from '../../assets/avatar.png'
@@ -22,13 +25,73 @@ const form = reactive({
   phone: '123 - 456 - 7890',
 })
 
+// One error string per field — empty string means no error
+const errors = reactive({
+  fullName: '',
+  email: '',
+  phone: '',
+})
+
+// --- Validation rules ---
+
+// Full name: required, at least 2 characters, max 50 characters
+function validateFullName(value: string): string {
+  if (!value.trim()) return 'Full name is required.'
+  if (value.trim().length < 2) return 'Full name must be at least 2 characters.'
+  if (value.trim().length > 50) return 'Full name cannot exceed 50 characters.'
+  return ''
+}
+
+// Email: required and must match a basic email pattern
+function validateEmail(value: string): string {
+  if (!value.trim()) return 'Email is required.'
+  // Simple regex: something@something.something
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailPattern.test(value.trim())) return 'Please enter a valid email address.'
+  return ''
+}
+
+// Phone: required, digits/spaces/dashes only, between 7 and 15 digits
+function validatePhone(value: string): string {
+  if (!value.trim()) return 'Phone number is required.'
+  // Strip all non-digit characters to count the actual digits
+  const digitsOnly = value.replace(/\D/g, '')
+  if (digitsOnly.length < 7) return 'Phone number is too short.'
+  if (digitsOnly.length > 15) return 'Phone number is too long.'
+  // Allow digits, spaces, dashes, parentheses, and + for country codes
+  const phonePattern = /^[0-9\s\-+(). ]+$/
+  if (!phonePattern.test(value.trim())) return 'Phone number contains invalid characters.'
+  return ''
+}
+
+// Runs all three validators and writes results into errors reactive object.
+// Returns true if everything is valid, false if anything failed.
+function validateAll(): boolean {
+  errors.fullName = validateFullName(form.fullName)
+  errors.email    = validateEmail(form.email)
+  errors.phone    = validatePhone(form.phone)
+  // If all three error strings are empty, the form is valid
+  return !errors.fullName && !errors.email && !errors.phone
+}
+
+// Clear all error messages (e.g. when switching back to view mode without submitting)
+function clearErrors() {
+  errors.fullName = ''
+  errors.email    = ''
+  errors.phone    = ''
+}
+
 function handleButtonClick() {
   if (!isEditing.value) {
-    // EDIT clicked — switch to edit mode
+    // EDIT clicked — switch to edit mode, any old errors get cleared
+    clearErrors()
     isEditing.value = true
   } else {
-    // SUBMIT clicked — save and return to view mode
-    isEditing.value = false
+    // SUBMIT clicked — validate first; only exit edit mode if everything passes
+    if (validateAll()) {
+      isEditing.value = false
+    }
+    // If validation failed, we stay in edit mode and errors are shown under each field
   }
 }
 </script>
@@ -47,23 +110,27 @@ function handleButtonClick() {
     </div>
 
     <!-- Fields: readonly in view mode, editable in edit mode -->
+    <!-- Error messages appear under each field only after a failed SUBMIT attempt -->
     <div class="profile-form__fields">
       <BaseInput
         v-model="form.fullName"
         label="Full name"
         :readonly="!isEditing"
+        :error="errors.fullName"
       />
       <BaseInput
         v-model="form.email"
         label="Email"
         type="email"
         :readonly="!isEditing"
+        :error="errors.email"
       />
       <BaseInput
         v-model="form.phone"
         label="Phone Number"
         type="tel"
         :readonly="!isEditing"
+        :error="errors.phone"
       />
     </div>
 
