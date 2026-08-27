@@ -12,15 +12,30 @@ import SearchSuggestionItem from '../components/molecules/SearchSuggestionItem.v
 const router = useRouter()
 const query = ref('')
 const suggestions = ref<GeocodingResult[]>([])
+const inputError = ref('')  // shown below the search bar when input is too short
 let debounceTimer: ReturnType<typeof setTimeout>
 
-// Watch the query and fetch suggestions after user stops typing for 300ms (debounce)
+// Watch the query and fetch suggestions after user stops typing for 300ms (debounce).
+// If the query is too short we clear suggestions and show an inline error message.
 watch(query, (val) => {
   clearTimeout(debounceTimer)
-  if (!val.trim() || val.length < 2) {
+
+  // Nothing typed yet — clear everything silently
+  if (!val.trim()) {
     suggestions.value = []
+    inputError.value = ''
     return
   }
+
+  // Too short — clear suggestions and show a visible hint
+  if (val.trim().length < 2) {
+    suggestions.value = []
+    inputError.value = 'Please enter at least 2 characters.'
+    return
+  }
+
+  // Valid length — clear any previous error and fetch suggestions
+  inputError.value = ''
   debounceTimer = setTimeout(async () => {
     const { data } = await searchCities(val.trim())
     suggestions.value = data ?? []
@@ -103,6 +118,9 @@ function goBack() {
       </button>
     </div>
 
+    <!-- Inline error — only visible when the query is too short -->
+    <p v-if="inputError" class="search-page__error" role="alert">{{ inputError }}</p>
+
     <!-- Suggestion list -->
     <ul
       v-if="suggestions.length > 0"
@@ -166,5 +184,11 @@ function goBack() {
 .search-page__suggestions {
   padding: 8px 0;
   margin: 0;
+}
+
+.search-page__error {
+  font-size: 13px;
+  color: var(--color-error);
+  padding: 6px 4px 0;
 }
 </style>
