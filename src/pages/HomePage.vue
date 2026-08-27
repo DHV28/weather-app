@@ -12,7 +12,7 @@ import WeatherList from '../components/organisms/WeatherList.vue'
 
 const router = useRouter()
 const searchQuery = ref('')
-const { weatherState, searchCity, fetchByCoords } = useWeather()
+const { weatherState, fetchByCoords } = useWeather()
 const { getCurrentPosition } = useGeolocation()
 
 // Pull the city cards list from global state
@@ -27,13 +27,6 @@ onMounted(async () => {
     fetchByCoords(position.lat, position.lon)
   }
 })
-
-// Called when user presses Enter in the search bar
-async function onSearch(query: string) {
-  if (!query.trim()) return
-  await searchCity(query.trim())
-  searchQuery.value = ''
-}
 
 function onCitySelected(city: string) {
   router.push({ name: 'Detail', params: { city } })
