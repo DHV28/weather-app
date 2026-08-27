@@ -6,27 +6,25 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWeather } from '../composables/useWeather'
+import { useGeolocation } from '../composables/useGeolocation'
 import SearchBar from '../components/atoms/SearchBar.vue'
 import WeatherList from '../components/organisms/WeatherList.vue'
 
 const router = useRouter()
 const searchQuery = ref('')
 const { weatherState, searchCity, fetchByCoords } = useWeather()
+const { getCurrentPosition } = useGeolocation()
 
 // Pull the city cards list from global state
 const cities = computed(() => weatherState.cityCards)
 
-// On page load, ask the browser for the user's GPS location
-onMounted(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        fetchByCoords(position.coords.latitude, position.coords.longitude)
-      },
-      () => {
-        // User denied location — that's fine, they can search manually
-      }
-    )
+// On page load, ask the browser for the user's GPS location via our composable.
+// If the user denies permission, getCurrentPosition returns null and we do nothing —
+// they can still search manually.
+onMounted(async () => {
+  const position = await getCurrentPosition()
+  if (position) {
+    fetchByCoords(position.lat, position.lon)
   }
 })
 
