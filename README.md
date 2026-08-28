@@ -6,6 +6,7 @@ A weather forecast app built with Vue, TypeScript, and Vite. It uses the OpenWea
 
 ## What it does
 
+- Detects your location on load and shows the current weather for where you are
 - Lets you search for any city using the search page, which shows live suggestions as you type
 - Tapping a suggestion takes you to a detail page with hourly and weekly forecasts
 - You can save cities to a list on the home screen and remove them any time
@@ -100,3 +101,4 @@ npm run lint     # Run ESLint across all .ts and .vue files
 - Weather icons come from OpenWeatherMap's icon CDN (`img/wn/{icon}@4x.png`).
 - City search uses OpenWeatherMap's Geocoding API (`/geo/1.0/direct`) so users get a list of matching cities before navigating to the detail page. This avoids loading the wrong city when names are ambiguous (e.g. Milan, Italy vs Milan, IL).
 - The `.env` file is in `.gitignore` so the API key is never committed.
+- On load, the app requests the browser's Geolocation API to show a "My Location" card automatically. If location access is denied or the device cannot get a fix (common on Mac since it has no GPS and relies on WiFi positioning), the app falls back gracefully and lets the user search manually instead.
