@@ -1,5 +1,102 @@
-# Vue 3 + TypeScript + Vite
+# Weather App
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A weather forecast app built with Vue, TypeScript, and Vite. It uses the OpenWeatherMap API to show current weather and a 5-day forecast.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+---
+
+## What it does
+
+- Lets you search for any city using the search page, which shows live suggestions as you type
+- Tapping a suggestion takes you to a detail page with hourly and weekly forecasts
+- You can save cities to a list on the home screen and remove them any time
+- Profile page with an edit form that validates your name, email, and phone number
+
+---
+
+## Tech stack
+
+- Vue 3 with Composition API and `<script setup>`
+- TypeScript with strict mode
+- Vite for bundling and dev server
+- Vue Router 4 for navigation (Detail and Search pages are lazy-loaded)
+- Plain CSS with BEM naming and CSS custom properties
+- OpenWeatherMap REST API (current weather, forecast, geocoding)
+- Browser Geolocation API for auto-detecting the user's location
+- FontAwesome for icons
+
+---
+
+## Project structure
+
+This project follows the Atomic Design methodology.
+
+```
+src/
+  components/
+    atoms/          Small, single-purpose components (BaseInput, BaseButton, SearchBar, AvatarImage)
+    molecules/      Groups of atoms that work together (WeatherCard, HourlyCard, DailyForecastRow, SearchSuggestionItem)
+    organisms/      Complex sections made of molecules (WeatherList, HourlyForecast, WeeklyForecast, ProfileForm)
+    templates/      Page layout shell (MainLayout — provides max-width centering for all pages)
+  pages/            Full pages wired to routes (HomePage, SearchPage, DetailPage, ProfilePage)
+  composables/      Reusable logic (useWeather, useGeolocation)
+  services/         API calls (weather.api.ts)
+  store/            Global reactive state (weatherState.ts)
+  types/            TypeScript interfaces and types (weather.types.ts)
+  router/           Vue Router config (index.ts)
+  style.css         Global CSS reset and design tokens
+```
+
+---
+
+## Getting started
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/DHV28/weather-app
+cd weather-app
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up your API key
+
+Copy the example env file and add your OpenWeatherMap key:
+
+```bash
+cp .env.example .env
+```
+
+Then open `.env` and replace `your_api_key_here` with your actual key.
+You can get a free key at https://openweathermap.org/api — the free tier is enough for this app.
+
+### 4. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173 in your browser.
+
+---
+
+## Other commands
+
+```bash
+npm run build    # Type-check and build for production
+npm run preview  # Preview the production build locally
+npm run lint     # Run ESLint across all .ts and .vue files
+```
+
+---
+
+## Notes
+
+- The app is designed for a mobile screen width (430px). On desktop it stays centred and phone-sized, which matches the Figma designs.
+- Weather icons come from OpenWeatherMap's icon CDN (`img/wn/{icon}@4x.png`).
+- City search uses OpenWeatherMap's Geocoding API (`/geo/1.0/direct`) so users get a list of matching cities before navigating to the detail page. This avoids loading the wrong city when names are ambiguous (e.g. Milan, Italy vs Milan, IL).
+- The `.env` file is in `.gitignore` so the API key is never committed.
