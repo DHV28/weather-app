@@ -35,14 +35,15 @@ const displayCity = computed(() =>
   (route.query.displayName as string) || weather.value?.name || props.city
 )
 
-// True if this city is already saved in the home list
+// True if this city is already saved — checked by API city ID, not name,
+// so "Milan, Italy" and "Milan, Canada" are treated as different cities
 const isSaved = computed(() =>
-  weatherState.cityCards.some(c => c.city.toLowerCase() === props.city.toLowerCase())
+  weather.value ? weatherState.cityCards.some(c => c.id === weather.value!.id) : false
 )
 
 // My Location card is always in the list but cannot be added or removed manually
 const isMyLocation = computed(() =>
-  weatherState.cityCards.find(c => c.city.toLowerCase() === props.city.toLowerCase())?.isMyLocation ?? false
+  weather.value ? weatherState.cityCards.find(c => c.id === weather.value!.id)?.isMyLocation ?? false : false
 )
 
 // Add city to home list using already-loaded data — no extra API call needed
@@ -53,10 +54,9 @@ function addToList() {
   router.push({ name: 'Home' })
 }
 
-// Remove city from home list then go back
+// Remove city from home list then go back — use API id for exact match
 function removeFromList() {
-  const card = weatherState.cityCards.find(c => c.city.toLowerCase() === props.city.toLowerCase())
-  if (card) weatherActions.removeCityCard(card.id)
+  if (weather.value) weatherActions.removeCityCard(weather.value.id)
   router.push({ name: 'Home' })
 }
 
@@ -157,7 +157,7 @@ function refresh() { fetchDetail(props.city) }
   background: #f0f2f8;
 }
 
-/* Periwinkle blue — matches the Figma hero */
+/* Periwinkle blue*/
 .detail-page__hero {
   background: #4a5bc8;
   padding: 16px 20px 50px;
