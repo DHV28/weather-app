@@ -9,6 +9,8 @@ import WeatherCard from '../molecules/WeatherCard.vue'
 interface CityWeather {
   id: number
   city: string
+  lat: number
+  lon: number
   subtitle: string
   temperature: number
   condition: string
