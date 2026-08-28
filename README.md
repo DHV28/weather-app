@@ -9,7 +9,7 @@ A weather forecast app built with Vue, TypeScript, and Vite. It uses the OpenWea
 - Detects your location on load and shows the current weather for where you are
 - Lets you search for any city using the search page, which shows live suggestions as you type
 - Tapping a suggestion takes you to a detail page with hourly and weekly forecasts
-- You can save cities to a list on the home screen and remove them any time
+- You can save cities to a list on the home screen and remove them any time — the list persists across page refreshes
 - Profile page with an edit form that validates your name, email, and phone number
 
 ---
@@ -23,6 +23,7 @@ A weather forecast app built with Vue, TypeScript, and Vite. It uses the OpenWea
 - Plain CSS with BEM naming and CSS custom properties
 - OpenWeatherMap REST API (current weather, forecast, geocoding)
 - Browser Geolocation API for auto-detecting the user's location
+- localStorage API for persisting saved cities across sessions
 - FontAwesome for icons
 
 ---
@@ -104,6 +105,9 @@ Tests are written with Vitest and Vue Test Utils. They cover:
 - Form validation logic (required fields, email format, character limits, phone rules)
 - `BaseInput` component (label rendering, value binding, error messages, emit behaviour)
 - `WeatherCard` component (city name, temperature, My Location label, click events)
+- `useGeolocation` composable (success path, unsupported browser, permission denied, error states)
+- `weatherState` store (addCityCard, removeCityCard, setMyLocationCard, loading/error state, localStorage writes)
+- `useWeather` composable (searchCity, fetchDetail, fetchDetailByCoords, addCurrentToList — API mocked)
 
 To run them:
 
