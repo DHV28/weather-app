@@ -26,6 +26,10 @@ export interface WeatherData {
   name: string        // city name
   dt: number          // timestamp of the data
   timezone: number    // timezone offset in seconds from UTC
+  coord: {
+    lat: number
+    lon: number
+  }
   sys: {
     country: string   // e.g. "MY"
     sunrise: number
@@ -92,6 +96,8 @@ export interface CityCard {
   id: number
   city: string
   country: string
+  lat: number
+  lon: number
   subtitle: string   // local time or area description
   temperature: number
   condition: string

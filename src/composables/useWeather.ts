@@ -2,7 +2,7 @@
 // Composable that any component can use to fetch and read weather data.
 
 import { weatherState, weatherActions } from '../store/weatherState'
-import { getCurrentWeather, getForecast, getWeatherByCoords } from '../services/weather.api'
+import { getCurrentWeather, getForecast, getWeatherByCoords, getForecastByCoords } from '../services/weather.api'
 import { WeatherUnit } from '../types/weather.types'
 import type { CityCard } from '../types/weather.types'
 
@@ -39,6 +39,8 @@ export function useWeather() {
       id: data.id,
       city: data.name,
       country: data.sys.country,
+      lat: data.coord.lat,
+      lon: data.coord.lon,
       subtitle: formatLocalTime(data.dt, data.timezone),
       temperature: Math.round(data.main.temp),
       condition: data.weather[0]?.description ?? '',
@@ -68,6 +70,8 @@ export function useWeather() {
       id: data.id,
       city: data.name,
       country: data.sys.country,
+      lat: data.coord.lat,
+      lon: data.coord.lon,
       subtitle: data.name, // for "My Location" we show the area name as subtitle
       temperature: Math.round(data.main.temp),
       condition: data.weather[0]?.description ?? '',
@@ -83,6 +87,7 @@ export function useWeather() {
 
   // Fetch detail + forecast for a single city (used on the Detail page)
   async function fetchDetail(city: string) {
+    weatherActions.clearWeather() // clear stale data so isSaved doesn't read the wrong city
     weatherActions.setLoading(true)
     weatherActions.setError(null)
 
@@ -105,6 +110,7 @@ export function useWeather() {
   // Fetch detail + forecast by exact coordinates — used when coming from Search
   // so "Milan, IL" doesn't accidentally load "Milan, Italy"
   async function fetchDetailByCoords(lat: number, lon: number) {
+    weatherActions.clearWeather() // clear stale data so isSaved doesn't read the wrong city
     weatherActions.setLoading(true)
     weatherActions.setError(null)
 
@@ -116,7 +122,8 @@ export function useWeather() {
       return
     }
 
-    const forecastRes = await getForecast(weatherRes.data.name, WeatherUnit.Metric)
+    // Use coords for forecast too — avoids "Milan, IL" returning Milan, Italy's forecast
+    const forecastRes = await getForecastByCoords(lat, lon, WeatherUnit.Metric)
 
     weatherActions.setCurrentWeather(weatherRes.data)
     weatherActions.setForecast(forecastRes.data?.list ?? [])
@@ -135,6 +142,8 @@ export function useWeather() {
       id: data.id,
       city: displayName ?? data.name,
       country: data.sys.country,
+      lat: data.coord.lat,
+      lon: data.coord.lon,
       subtitle: formatLocalTime(data.dt, data.timezone),
       temperature: Math.round(data.main.temp),
       condition: data.weather[0]?.description ?? '',

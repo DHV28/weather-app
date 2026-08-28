@@ -61,3 +61,13 @@ export async function getForecast(
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=${unit}&appid=${API_KEY}`
   return apiFetch<ForecastResponse>(url)
 }
+
+// Fetch 5-day / 3-hour forecast by coordinates — avoids ambiguous city name lookups
+export async function getForecastByCoords(
+  lat: number,
+  lon: number,
+  unit: WeatherUnit = WeatherUnit.Metric
+): Promise<ApiResponse<ForecastResponse>> {
+  const url = `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+  return apiFetch<ForecastResponse>(url)
+}

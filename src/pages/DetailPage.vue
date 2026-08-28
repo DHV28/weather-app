@@ -200,6 +200,8 @@ function refresh() { fetchDetail(props.city) }
   width: 140px;
   height: 140px;
   margin: 4px 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
 }
 
 .detail-page__temp {

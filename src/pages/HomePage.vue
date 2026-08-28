@@ -28,8 +28,12 @@ onMounted(async () => {
   }
 })
 
-function onCitySelected(city: string) {
-  router.push({ name: 'Detail', params: { city } })
+function onCitySelected(card: { city: string; lat: number; lon: number; isMyLocation?: boolean }) {
+  router.push({
+    name: 'Detail',
+    params: { city: card.city },
+    query: { lat: card.lat, lon: card.lon, displayName: card.city },
+  })
 }
 
 function goToProfile() {

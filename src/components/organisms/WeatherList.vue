@@ -22,7 +22,7 @@ defineProps<{
 }>()
 
 defineEmits<{
-  'city-selected': [city: string]
+  'city-selected': [city: CityWeather]
 }>()
 </script>
 
@@ -38,7 +38,7 @@ defineEmits<{
       :high="item.high"
       :low="item.low"
       :is-my-location="item.isMyLocation"
-      @select="$emit('city-selected', item.city)"
+      @select="$emit('city-selected', item)"
     />
   </section>
 </template>
