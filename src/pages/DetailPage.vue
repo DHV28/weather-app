@@ -40,6 +40,11 @@ const isSaved = computed(() =>
   weatherState.cityCards.some(c => c.city.toLowerCase() === props.city.toLowerCase())
 )
 
+// My Location card is always in the list but cannot be added or removed manually
+const isMyLocation = computed(() =>
+  weatherState.cityCards.find(c => c.city.toLowerCase() === props.city.toLowerCase())?.isMyLocation ?? false
+)
+
 // Add city to home list using already-loaded data — no extra API call needed
 // Pass displayName from route query so we save "Jakarta" not the district name
 function addToList() {
@@ -95,14 +100,17 @@ function refresh() { fetchDetail(props.city) }
             <FontAwesomeIcon :icon="['fas', 'arrow-left']" />
           </button>
           <h1 class="detail-page__city">{{ displayCity }}, {{ weather.sys.country }}</h1>
-          <!-- Shows + if city not saved yet, trash if already in the list -->
+          <!-- My Location cannot be added or removed — hide the button entirely -->
           <button
+            v-if="!isMyLocation"
             class="detail-page__icon-btn"
             :aria-label="isSaved ? 'Remove city' : 'Add to list'"
             @click="isSaved ? removeFromList() : addToList()"
           >
             <FontAwesomeIcon :icon="['fas', isSaved ? 'trash' : 'plus']" />
           </button>
+          <!-- Spacer keeps the title centred when button is hidden -->
+          <div v-else class="detail-page__icon-btn" aria-hidden="true" />
         </header>
 
         <p class="detail-page__date">{{ formatDate(weather.dt) }}</p>
