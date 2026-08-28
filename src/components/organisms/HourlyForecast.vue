@@ -6,7 +6,7 @@ import HourlyCard from '../molecules/HourlyCard.vue'
 import type { ForecastItem } from '../../types/weather.types'
 
 const props = defineProps<{
-  items: ForecastItem[]
+  items: readonly ForecastItem[]
   timezoneOffset: number
 }>()
 

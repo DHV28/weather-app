@@ -7,7 +7,7 @@ import DailyForecastRow from '../molecules/DailyForecastRow.vue'
 import type { ForecastItem } from '../../types/weather.types'
 
 const props = defineProps<{
-  items: ForecastItem[]
+  items: readonly ForecastItem[]
 }>()
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

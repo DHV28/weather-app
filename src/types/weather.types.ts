@@ -43,7 +43,7 @@ export interface WeatherData {
     speed: number
     deg: number
   }
-  weather: WeatherCondition[]
+  weather: readonly WeatherCondition[]
 }
 
 // Shape of one entry in the 5-day forecast list (/forecast endpoint)
@@ -56,7 +56,7 @@ export interface ForecastItem {
     temp_max: number
     humidity: number
   }
-  weather: WeatherCondition[]
+  weather: readonly WeatherCondition[]
   wind: {
     speed: number
   }

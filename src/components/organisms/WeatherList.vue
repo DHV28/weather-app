@@ -18,7 +18,7 @@ interface CityWeather {
 }
 
 defineProps<{
-  cities: CityWeather[]
+  cities: readonly CityWeather[]
 }>()
 
 defineEmits<{
