@@ -98,13 +98,19 @@ function handleButtonClick() {
 
 <template>
   <div class="profile-form">
-    <!-- Avatar: pencil icon only appears in edit mode -->
-    <div class="profile-form__avatar-section">
-      <AvatarImage
-        :src="PLACEHOLDER_AVATAR"
-        alt="Profile photo"
-        :editable="isEditing"
-      />
+    <!-- Blue hero section — avatar is pinned to its bottom edge, straddling the curve -->
+    <div class="profile-form__hero">
+      <div class="profile-form__avatar-wrap">
+        <AvatarImage
+          :src="PLACEHOLDER_AVATAR"
+          alt="Profile photo"
+          :editable="isEditing"
+        />
+      </div>
+    </div>
+
+    <!-- Name and meta sit in white area below the curve -->
+    <div class="profile-form__identity">
       <p class="profile-form__name">{{ form.fullName }}</p>
       <p class="profile-form__meta">{{ form.email }} | +01 234 567 89</p>
     </div>
@@ -125,13 +131,16 @@ function handleButtonClick() {
         :readonly="!isEditing"
         :error="errors.email"
       />
+      <!-- Phone field: flag passed via slot so it stays in line with the input -->
       <BaseInput
         v-model="form.phone"
         label="Phone Number"
         type="tel"
         :readonly="!isEditing"
         :error="errors.phone"
-      />
+      >
+        <template #prefix>🇺🇸</template>
+      </BaseInput>
     </div>
 
     <!-- Button text switches between EDIT and SUBMIT -->
@@ -148,15 +157,34 @@ function handleButtonClick() {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 60px);
-  padding: 24px 20px;
+  background: #ffffff;
 }
 
-.profile-form__avatar-section {
+/* Blue section — fixed height, avatar absolutely pinned to its bottom centre */
+.profile-form__hero {
+  background: #f5f8ff;
+  border-radius: 0 0 40% 40%;
+  position: relative;
+  height: 140px;
+  /* margin-bottom makes room for the part of the avatar that hangs below */
+  margin-bottom: 40px;
+}
+
+/* Avatar centred on the bottom edge — only 30px hangs below the curve */
+.profile-form__avatar-wrap {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Name and meta sit in the white area below */
+.profile-form__identity {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 32px;
+  gap: 4px;
+  padding: 0 20px 20px;
 }
 
 .profile-form__name {
@@ -168,7 +196,7 @@ function handleButtonClick() {
 
 .profile-form__meta {
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -177,10 +205,12 @@ function handleButtonClick() {
   flex-direction: column;
   gap: 16px;
   flex: 1;
+  padding: 0 20px;
 }
+
 
 .profile-form__action {
   margin-top: auto;
-  padding-top: 24px;
+  padding: 24px 20px;
 }
 </style>

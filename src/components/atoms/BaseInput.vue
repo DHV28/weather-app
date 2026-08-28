@@ -18,63 +18,87 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="base-input">
-    <!-- Label floats above the input field -->
+  <!-- Outer box acts as the visible bordered container -->
+  <div
+    class="base-input"
+    :class="{ 'base-input--error': error, 'base-input--readonly': readonly }"
+  >
+      <!-- Label sits inside the border at the top -->
     <label class="base-input__label">{{ label }}</label>
-    <input
-      class="base-input__field"
-      :class="{ 'base-input__field--error': error, 'base-input__field--readonly': readonly }"
-      :value="modelValue"
-      :type="type ?? 'text'"
-      :readonly="readonly"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    <!-- Input row: optional prefix (e.g. flag emoji) + the actual input -->
+    <div class="base-input__row">
+      <span v-if="$slots.prefix" class="base-input__prefix"><slot name="prefix" /></span>
+      <input
+        class="base-input__field"
+        :value="modelValue"
+        :type="type ?? 'text'"
+        :readonly="readonly"
+        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      />
+    </div>
     <!-- Only renders when there is a validation error -->
     <span v-if="error" class="base-input__error" role="alert">{{ error }}</span>
   </div>
 </template>
 
 <style scoped>
+/* The whole box — border lives here, not on the input itself */
 .base-input {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.base-input__label {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  padding: 0 4px;
-}
-
-.base-input__field {
-  padding: 14px 16px;
+  gap: 2px;
+  padding: 10px 16px 12px;
   border: 1.5px solid var(--color-border);
   border-radius: 12px;
-  font-size: 16px;
-  color: var(--color-text-primary);
-  background: var(--color-input-bg);
-  outline: none;
+  background: #ffffff;
   transition: border-color 0.2s;
 }
 
-.base-input__field:focus {
+.base-input:focus-within {
   border-color: var(--color-dark-navy);
 }
 
-.base-input__field--error {
+.base-input--error {
   border-color: var(--color-error);
 }
 
-/* Readonly fields look the same visually but cannot be typed into */
-.base-input__field--readonly {
-  background: var(--color-input-bg);
+/* Label is small and sits at the top inside the box */
+.base-input__label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1;
+}
+
+.base-input__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.base-input__prefix {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Input has no border or background — the outer box handles that */
+.base-input__field {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  outline: none;
+  padding: 0;
+  flex: 1;
+}
+
+.base-input--readonly {
   cursor: default;
 }
 
 .base-input__error {
   font-size: 12px;
   color: var(--color-error);
-  padding: 0 4px;
+  margin-top: 2px;
 }
 </style>

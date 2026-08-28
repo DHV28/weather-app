@@ -33,7 +33,7 @@ function goBack() {
 <style scoped>
 .profile-page {
   min-height: 100vh;
-  background-color: var(--color-page-bg);
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
 }
@@ -43,7 +43,7 @@ function goBack() {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background-color: var(--color-page-bg);
+  background-color: #f5f8ff;
 }
 
 .profile-page__back-btn {

@@ -34,8 +34,8 @@ defineEmits<{
 <style scoped>
 .avatar {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   margin: 0 auto;
 }
 
@@ -55,7 +55,7 @@ defineEmits<{
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #ffffff;
+  background: #f5f5f5;
   border: 1px solid var(--color-border);
   cursor: pointer;
   display: flex;

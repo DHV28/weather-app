@@ -48,9 +48,10 @@ const cardBackground = getBackground(props.condition)
     <div class="weather-card__overlay">
       <div class="weather-card__top">
         <div>
-          <p v-if="isMyLocation" class="weather-card__my-location-label">My Location</p>
-          <h2 class="weather-card__city">{{ city }}</h2>
-          <p class="weather-card__subtitle">{{ subtitle }}</p>
+          <!-- My Location card: "My Location" is the headline, actual area name is subtitle -->
+          <!-- Regular card: city name is the headline, local time is subtitle -->
+          <h2 class="weather-card__city">{{ isMyLocation ? 'My Location' : city }}</h2>
+          <p class="weather-card__subtitle">{{ isMyLocation ? city : subtitle }}</p>
         </div>
         <p class="weather-card__temp">{{ temperature }}°</p>
       </div>
@@ -112,7 +113,6 @@ const cardBackground = getBackground(props.condition)
 
 .weather-card__subtitle {
   font-size: 13px;
-  opacity: 0.8;
   margin: 2px 0 0 0;
 }
 
@@ -132,13 +132,11 @@ const cardBackground = getBackground(props.condition)
 
 .weather-card__condition {
   font-size: 14px;
-  opacity: 0.9;
   margin: 0;
 }
 
 .weather-card__range {
   font-size: 13px;
-  opacity: 0.85;
   margin: 0;
 }
 </style>
