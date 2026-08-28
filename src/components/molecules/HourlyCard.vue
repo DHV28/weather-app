@@ -5,6 +5,7 @@
 
 defineProps<{
   iconCode: string
+  condition: string
   temperature: number
   time: string
 }>()
@@ -15,7 +16,7 @@ defineProps<{
     <img
       class="hourly-card__icon"
       :src="`https://openweathermap.org/img/wn/${iconCode}@4x.png`"
-      alt="weather icon"
+      :alt="condition"
     />
     <p class="hourly-card__temp">{{ temperature }}°</p>
     <p class="hourly-card__time">{{ time }}</p>

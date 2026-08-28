@@ -17,7 +17,7 @@ defineProps<{
       <img
         class="daily-row__icon"
         :src="`https://openweathermap.org/img/wn/${iconCode}@4x.png`"
-        alt="weather icon"
+        :alt="condition"
       />
     </div>
 

@@ -33,6 +33,7 @@ const hourlyItems = props.items.slice(0, 4)
         v-for="item in hourlyItems"
         :key="item.dt"
         :icon-code="item.weather[0]?.icon ?? '01d'"
+        :condition="item.weather[0]?.description ?? ''"
         :temperature="Math.round(item.main.temp)"
         :time="toLocalTime(item.dt, timezoneOffset)"
       />
