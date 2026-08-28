@@ -88,10 +88,47 @@ Open http://localhost:5173 in your browser.
 ## Other commands
 
 ```bash
-npm run build    # Type-check and build for production
-npm run preview  # Preview the production build locally
-npm run lint     # Run ESLint across all .ts and .vue files
+npm run build      # Type-check and build for production
+npm run preview    # Preview the production build locally
+npm run lint       # Run ESLint across all .ts and .vue files
+npm run test       # Run all tests once
+npm run test:watch # Run tests in watch mode (re-runs on file save)
 ```
+
+---
+
+## Tests
+
+Tests are written with Vitest and Vue Test Utils. They cover:
+
+- Form validation logic (required fields, email format, character limits, phone rules)
+- `BaseInput` component (label rendering, value binding, error messages, emit behaviour)
+- `WeatherCard` component (city name, temperature, My Location label, click events)
+
+To run them:
+
+```bash
+npm run test
+```
+
+---
+
+## Architectural decisions
+
+- **No Pinia** — state is managed with Vue's built-in `reactive()` in a singleton module (`store/weatherState.ts`). For an app this size it keeps things simple without the boilerplate of an external store library.
+- **Geocoding before navigation** — the Search page uses OpenWeatherMap's Geocoding API to resolve city names to coordinates before navigating. This prevents the wrong city from loading when names are ambiguous (e.g. "Milan, IL" vs "Milan, Italy").
+- **Composables for side effects** — geolocation and weather fetching live in `useGeolocation.ts` and `useWeather.ts` so pages stay thin and logic is reusable.
+- **Lazy-loaded routes** — Detail, Search, and Profile pages are lazy-loaded so the initial bundle only includes the Home page.
+- **BEM naming** — all CSS classes follow BEM (Block__Element--Modifier) so styles are scoped by component and easy to trace.
+
+---
+
+## Credits
+
+- Weather background images from [Unsplash](https://unsplash.com)
+- Profile avatar illustration from [Flaticon](https://www.flaticon.com)
+- Weather icons from the OpenWeatherMap icon CDN
+- UI icons from [FontAwesome](https://fontawesome.com)
 
 ---
 
